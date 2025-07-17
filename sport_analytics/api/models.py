@@ -4,6 +4,7 @@ from django.db import models
 from django.db.models import JSONField
 from django.utils import timezone
 from django.core.exceptions import ValidationError
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 
 class BaseModel(models.Model):
@@ -18,6 +19,7 @@ class BaseModel(models.Model):
 
     class Meta:
         abstract = True
+
     def __str__(self):
         return (f'Время создания - {self.created_at}.'
                 f' Время обновления - {self.updated_at}')
@@ -77,6 +79,7 @@ class Coach(BaseModel):
     birth_date = models.DateField(
         'Дата рождения'
     )
+
     class Meta:
         verbose_name = 'Тренер'
         verbose_name_plural = 'Тренеры'
@@ -91,18 +94,15 @@ class Player(BaseModel):
     MAX_EXPERIENCE = 100
 
     class Meta:
-        # MIN_EXPERIENCE = 0
-        # MAX_EXPERIENCE = 100
-
-        # constraints = [
-        #     # Проверка диапазона стажа
-        #     models.CheckConstraint(
-        #         check=models.Q(experience__gte=models.F('MIN_EXPERIENCE')) & models.Q(experience__lte=models.F('MAX_EXPERIENCE')),
-        #         name='experience_range'
-        #     )
-        # ]
         verbose_name = 'Игрок'
         verbose_name_plural = 'Игроки'
+
+        constraints = [
+            models.CheckConstraint(
+                check=models.Q(experience__gte=0) & models.Q(experience__lte=100),
+                name='experience_range'
+            )
+        ]
 
     id = models.AutoField(
         primary_key=True,
@@ -115,17 +115,20 @@ class Player(BaseModel):
     birth_date = models.DateField('Дата рождения')
     experience = models.IntegerField(
         'Стаж',
-        # max_length=MAX_EXPERIENCE,
-        default=MIN_EXPERIENCE
+        default=MIN_EXPERIENCE,
+        validators=[
+            MaxValueValidator(MAX_EXPERIENCE),
+            MinValueValidator(MIN_EXPERIENCE)
+        ]
     )
-    # team = models.ForeignKey(
-    #     Team,
-    #     on_delete=models.SET_NULL,
-    #     related_name='players',
-    #     null=True,
-    #     blank=True,
-    #     verbose_name='Команда'
-    # )
+    team = models.ForeignKey(
+        Team,
+        on_delete=models.SET_NULL,
+        related_name='player_team',
+        null=True,
+        blank=True,
+        verbose_name='Команда'
+    )
     anthropometric = JSONField(
         'Антропометрические данные',
         null=True,
@@ -171,13 +174,6 @@ class Game(BaseModel):
     URL_MAX_LENGTH = 500
 
     class Meta:
-        constraints = [
-            # Игра не может быть в будущем
-            models.CheckConstraint(
-                check=models.Q(datetime__lte=timezone.now()),
-                name='game_date_past'
-            )
-        ]
         ordering = ['-datetime']
         verbose_name = 'Игра'
         verbose_name_plural = 'Игры'
@@ -240,13 +236,13 @@ class PlayerPosition(BaseModel):
         primary_key=True,
         verbose_name='ID'
     )
-    games = models.ForeignKey(
+    game = models.ForeignKey(
         Game,
         on_delete=models.CASCADE,
         related_name='player_positions',
         verbose_name='Игра'
     )
-    players = models.ForeignKey(
+    player = models.ForeignKey(
         Player,
         on_delete=models.CASCADE,
         related_name='player_positions',
@@ -288,4 +284,3 @@ class PlayerPosition(BaseModel):
 
     def __str__(self):
         return f"Позиция игрока {self.player} в игре {self.game} на {self.timestamp} секунде"
-
