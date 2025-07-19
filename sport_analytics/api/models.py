@@ -281,7 +281,6 @@ class PlayerPosition(BaseModel):
     class Meta:
         verbose_name = 'Позиция игрока'
         verbose_name_plural = 'Позиции игроков'
-        auto_now = False
 
     def __str__(self):
         return f"Позиция игрока {self.player} в игре {self.game} на {self.timestamp} секунде"

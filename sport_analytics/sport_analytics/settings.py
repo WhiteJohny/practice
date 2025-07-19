@@ -19,6 +19,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
+    'drf_spectacular',
+    'drf_spectacular_sidecar',
 
     'api.apps.ApiConfig',
 ]
@@ -51,6 +53,94 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'sport_analytics.wsgi.application'
+
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Sort Analytics API',
+    'DESCRIPTION': 'API для анализа спортивных игр',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': True,
+    'SWAGGER_UI_DIST': 'SIDECAR',
+    'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
+    'REDOC_DIST': 'SIDECAR',
+
+    'COMPONENT_SPLIT_REQUEST': True,
+    'COMPONENT_NO_READ_ONLY_REQUIRED': False,
+    'COMPONENT_SPLIT_PATCHES': True,
+
+    'SCHEMA_PATH_PREFIX': '/api/',
+    'SWAGGER_UI_SETTINGS': {
+        'deepLinking': True,
+        'persistAuthorization': True,
+        'displayOperationId': False,
+        'filter': True,
+        'docExpansion': 'none'
+    },
+    'TAGS': [
+        {
+            'name': 'players',
+            'description': 'Управление игроками, стажем и командами'
+        },
+        {
+            'name': 'games',
+            'description': 'Операции с играми, расписанием и результатами'
+        },
+        {
+            'name': 'teams',
+            'description': 'Управление спортивными командами'
+        },
+        {
+            'name': 'analytics',
+            'description': 'Аналитика игр и статистика'
+        },
+        {
+            'name': 'authentication',
+            'description': 'Аутентификация и управление доступом'
+        }
+    ],
+    'SECURITY': [
+        {
+            'Token': []
+        }
+    ],
+    'POSTPROCESSING_HOOKS': [
+        'drf_spectacular.hooks.postprocess_schema_enums'
+    ],
+
+    'GENERIC_ADDITIONAL_PROPERTIES': 'dict',
+
+    'SCHEMA_COERCE_PATH_PK_SUFFIX': True,
+    'SCHEMA_COERCE_METHOD_NAMES': {
+        'retrieve': 'read',
+        'list': 'list',
+    },
+
+    'ENUM_GENERATE_CHOICE_DESCRIPTION': True
+}
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': 'debug.log',
+        },
+    },
+    'loggers': {
+        'api': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
 
 DATABASES = {
     "default": {
