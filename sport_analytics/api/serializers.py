@@ -337,11 +337,6 @@ class TeamSerializer(serializers.ModelSerializer):
         many=True,
         required=False
     )
-    # players = serializers.PrimaryKeyRelatedField(
-    #     queryset=Player.objects.all(),
-    #     many=True,
-    #     required=False
-    # )
 
     class Meta:
         model = Team
@@ -350,7 +345,6 @@ class TeamSerializer(serializers.ModelSerializer):
             'name',
             'city_region',
             'coaches',
-            # 'players',
             'created_at',
             'updated_at',
         ]
@@ -369,19 +363,16 @@ class TeamSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         """Создание команды с обработкой отношений ManyToMany"""
         coaches_data = validated_data.pop('coaches', [])
-        # players_data = validated_data.pop('players', [])
 
         team = Team.objects.create(**validated_data)
 
         team.coaches.set(coaches_data)
-        # team.players.set(players_data)
 
         return team
 
     def update(self, instance, validated_data):
         """Обновление команды с обработкой отношений ManyToMany"""
         coaches_data = validated_data.pop('coaches', None)
-        # players_data = validated_data.pop('players', None)
 
         # Обновляем поля команды
         for attr, value in validated_data.items():
@@ -391,8 +382,6 @@ class TeamSerializer(serializers.ModelSerializer):
         # Обновляем связи если они были переданы
         if coaches_data is not None:
             instance.coaches.set(coaches_data)
-        # if players_data is not None:
-        #     instance.players.set(players_data)
 
         return instance
 
