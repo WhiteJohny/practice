@@ -45,11 +45,11 @@ class Team(BaseModel):
         verbose_name='Тренеры'
     )
 
-    players = models.ManyToManyField(
-        'Player',
-        related_name='teams',
-        verbose_name='Игроки'
-    )
+    # players = models.ManyToManyField(
+    #     'Player',
+    #     related_name='teams',
+    #     verbose_name='Игроки'
+    # )
 
     class Meta:
         verbose_name = 'Команда'

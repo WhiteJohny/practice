@@ -98,12 +98,18 @@ class GameViewSet(BaseViewSet):
 
 
 class PlayerPositionViewSet(BaseViewSet):
-    pass
+    queryset = PlayerPosition.objects.all()
+    serializer_class = PlayerPositionSerializer
+    resource_name = "playerPosition"
 
 
 class TeamViewSet(BaseViewSet):
-    pass
+    queryset = Team.objects.all()
+    serializer_class = TeamSerializer
+    resource_name = "teamSerializer"
 
 
 class CoachViewSet(BaseViewSet):
-    pass
+    queryset = Coach.objects.all()
+    serializer_class = CoachSerializer
+    resource_name = "coachSerializer"

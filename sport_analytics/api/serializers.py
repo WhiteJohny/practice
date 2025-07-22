@@ -332,8 +332,94 @@ class PlayerPositionSerializer(serializers.ModelSerializer):
 
 
 class TeamSerializer(serializers.ModelSerializer):
-    pass
+    coaches = serializers.PrimaryKeyRelatedField(
+        queryset=Coach.objects.all(),
+        many=True,
+        required=False
+    )
+    # players = serializers.PrimaryKeyRelatedField(
+    #     queryset=Player.objects.all(),
+    #     many=True,
+    #     required=False
+    # )
+
+    class Meta:
+        model = Team
+        fields = [
+            'id',
+            'name',
+            'city_region',
+            'coaches',
+            # 'players',
+            'created_at',
+            'updated_at',
+        ]
+        read_only_fields = ('created_at', 'updated_at')
+        extra_kwargs = {
+            'name': {
+                'help_text': 'Название команды.',
+                'required': True
+            },
+            'city_region': {
+                'help_text': 'Город/Регион команды.',
+                'required': True
+            }
+        }
+
+    def create(self, validated_data):
+        """Создание команды с обработкой отношений ManyToMany"""
+        coaches_data = validated_data.pop('coaches', [])
+        # players_data = validated_data.pop('players', [])
+
+        team = Team.objects.create(**validated_data)
+
+        team.coaches.set(coaches_data)
+        # team.players.set(players_data)
+
+        return team
+
+    def update(self, instance, validated_data):
+        """Обновление команды с обработкой отношений ManyToMany"""
+        coaches_data = validated_data.pop('coaches', None)
+        # players_data = validated_data.pop('players', None)
+
+        # Обновляем поля команды
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        # Обновляем связи если они были переданы
+        if coaches_data is not None:
+            instance.coaches.set(coaches_data)
+        # if players_data is not None:
+        #     instance.players.set(players_data)
+
+        return instance
 
 
 class CoachSerializer(serializers.ModelSerializer):
-    pass
+    class Meta:
+        model = Coach
+        fields = [
+            'id',
+            'full_name',
+            'contact_data',
+            'birth_date',
+            'created_at',
+            'updated_at',
+        ]
+        read_only_fields = ('created_at', 'updated_at')
+        extra_kwargs = {
+            'full_name': {
+                'help_text': 'ФИО тренера.',
+                'required': True
+            },
+            'contact_data': {
+                'help_text': 'Контактные данные тренера.',
+                'required': True
+            },
+            'birth_date': {
+                'help_text': 'Дата рождения тренера в формате YYYY-MM-DD.',
+                'required': True
+            }
+        }
