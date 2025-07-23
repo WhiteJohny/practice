@@ -20,6 +20,7 @@ router.register(r'coaches', CoachViewSet, basename='coach')
 
 
 urlpatterns = [
+    # API Schema & Documentation
     path('schema/', SpectacularAPIView.as_view(), name='schema'),
     path('docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
 

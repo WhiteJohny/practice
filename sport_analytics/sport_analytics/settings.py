@@ -74,7 +74,7 @@ REST_FRAMEWORK = {
 }
 
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'Sort Analytics API',
+    'TITLE': 'Sport Analytics API',
     'DESCRIPTION': 'API для анализа спортивных игр',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': True,
