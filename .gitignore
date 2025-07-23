@@ -103,10 +103,10 @@ celerybeat.pid
 
 # Environments
 .env
-sport_analytics/.env
+.env
 .venv
 .venv/
-sport_analytics/.env/
+.env/
 env/
 venv/
 ENV/
